@@ -1,26 +1,28 @@
 require 'minitest/autorun'
 
-class Person
-end
-
-def add_checked_attribute(klass, attribute, &validation)
-    klass.class_eval do
-        define_method attribute do 
+class Class
+    def attr_checked(attribute, &validation)
+         define_method attribute do 
             instance_variable_get "@#{attribute}"
         end
-    
-        define_method "#{attribute}=" do |new_age|
+
+         define_method "#{attribute}=" do |new_age|
             raise 'Invalid attribute' unless new_age
-            raise 'Invalid attribute' unless validation.call(new_age)
+            raise 'Invalid attribute' unless yield(new_age)
             instance_variable_set("@#{attribute}", new_age)
         end
+    end
+end
+
+class Person
+    attr_checked :age do |v|
+        v >= 18
     end
 end
 
 describe Person do 
     
     before do
-        add_checked_attribute(Person, :age) {|v| v >= 18}
         @bob = Person.new
     end
 
