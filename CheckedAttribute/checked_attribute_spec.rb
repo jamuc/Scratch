@@ -1,6 +1,11 @@
 require 'minitest/autorun'
 
-class Class
+module CheckedAttributes
+
+    def self.included(klass)
+        klass.extend CheckedAttributes
+    end
+
     def attr_checked(attribute, &validation)
          define_method attribute do 
             instance_variable_get "@#{attribute}"
@@ -15,6 +20,7 @@ class Class
 end
 
 class Person
+    include CheckedAttributes
     attr_checked :age do |v|
         v >= 18
     end
